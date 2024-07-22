@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customers</title>
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="c_style.css">n
+</head>
+<body>
+  <div class="container">
+    <nav class="sidebar">
+      <h2>BizGrow</h2>
+      <ul class="sidebar-menu">
+        <li><a href="../index.html">Dashboard</a></li>
+        <li><a href="customer.html">Customers</a></li>
+        <li><a href="items.html">Items</a></li>
+        <li><a href="invoices.html">Invoices</a></li>
+        <li><a href="reports.html">Reports</a></li>
+      </ul>
+    </nav>
+    <main class="main-content">
+      <div class="container">
+        <h1>Customer Form</h1>
+        <form id="customerForm">
+            <div class="form-group">
+                <label>Customer Type:</label>
+                <label><input type="radio" name="customerType" value="Business" checked> Business</label>
+                <label><input type="radio" name="customerType" value="Individual"> Individual</label>
+            </div>
+            <div class="form-group">
+                <label for="primaryContact">Primary Contact:</label>
+                <select id="salutation">
+                    <option value="Mr">Salutation</option>
+                    <option value="Mr">Mr.</option>
+                    <option value="Ms">Ms.</option>
+                    <option value="Mrs">Mrs.</option>
+                </select>
+                <input type="text" id="firstName" placeholder="First Name">
+                <input type="text" id="lastName" placeholder="Last Name">
+            </div>
+            <div class="form-group">
+                <label for="companyName">Company Name:</label>
+                <input type="text" id="companyName">
+            </div>
+            <div class="form-group">
+                <label for="displayName" class="required">Customer Display Name:</label>
+                <input type="text" id="displayName" required>
+            </div>
+            <div class="form-group">
+                <label for="currency">Currency:</label>
+                <select id="currency" disabled>
+                    <option value="INR" selected>INR - Indian Rupee</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="customerEmail">Customer Email:</label>
+                <input type="email" id="customerEmail">
+            </div>
+            <div class="form-group">
+                <label for="customerPhone">Customer Phone:</label>
+                <input type="text" id="workPhone" placeholder="Work Phone">
+                <input type="text" id="mobilePhone" placeholder="Mobile">
+            </div>
+            <div class="form-group">
+                <label for="pan">PAN:</label>
+                <input type="text" id="pan">
+            </div>
+            <div class="form-group">
+                <label for="paymentTerms">Payment Terms:</label>
+                <select id="paymentTerms">
+                    <option value="Due on Receipt" selected>Due on Receipt</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="enablePortal">Enable Portal:</label>
+                <input type="checkbox" id="enablePortal">
+            </div>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+    </main>
+  </div>
+  <script src="../script.js"></script>
+</body>
+</html>
