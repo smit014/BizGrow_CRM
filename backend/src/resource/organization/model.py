@@ -12,14 +12,17 @@ class Organization(Base):
     industry = Column(String, notnull=True)
     country = Column(String, notnull=True)
     country_state = Column(String, notnull=True)
+    address = Column(String)
     GST_no = Column(String)
     created_at = Column(DateTime, default=datetime.now())
     updated_at = Column(DateTime, default=datetime.now(), onupdate=datetime.now())
 
     users = relationship("User", back_populates="organization")
     invoices = relationship("Invoice", back_populates="organization")
+    customer = relationship("Customer", back_populates="organization")
     # reports = relationship("Report", back_populates="organization")
     # forecasts = relationship("Forecast", back_populates="organization")
     # inventory = relationship("Inventory", back_populates="organization")
 
     # todo: add Base currency support
+    # todo: add image logo of business
