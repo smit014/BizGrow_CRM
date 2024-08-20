@@ -15,9 +15,7 @@ class User(Base):
     updated_at = Column(DateTime, default=datetime.now(), onupdate=datetime.now())
     is_active = Column(Boolean, default=True)
     is_deleted = Column(Boolean, default=False)
-    organization_id = Column(String, ForeignKey("organizations.id"))
 
-    organization = relationship("Organization", back_populates="users")
     user_roles = relationship("UserRole", back_populates="user")
     invoices = relationship("Invoice", back_populates="user")
     # transactions = relationship("Transaction", back_populates="user")

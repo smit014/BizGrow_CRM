@@ -11,6 +11,7 @@ class UserRole(Base):
     user_id = Column(String, ForeignKey('users.id'))
     organization_id = Column(String, ForeignKey('organizations.id'))
     created_at = Column(DateTime, default=datetime.now())
+    updated_at = Column(DateTime, default=datetime.now())
 
     user = relationship("User", back_populates="user_roles")
     organization = relationship("Organization", back_populates="user_roles")

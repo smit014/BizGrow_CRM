@@ -15,9 +15,11 @@ def create_user(user_details):
         raise HTTPException(status_code=422, detail="Add email or phone number")
     if not user_details.get("password"):
         raise HTTPException(status_code=422, detail="Password is required")
-    user_data = db.query(User).filter_by(email = user_details.get("email"),is_active =True).first()
-    if user_data:
-        raise HTTPException(statusCode = 403 ,detail="email is alredy used")
+    
+    existing_user = db.query(User).filter_by(email=user_details.get("email"), is_active=True).first()
+    if existing_user:
+        raise HTTPException(status_code=403, detail="Email is already used, please log in")
+    
     user_info = User(
         id=id,
         name=user_details.get("name"),
@@ -28,7 +30,7 @@ def create_user(user_details):
     db.add(user_info)
     db.commit()
     db.close()
-    return {"Message": "User created successfully", "User_id": str(id)}
+    return JSONResponse({"Message": "User created successfully", "User_id": str(id)})
 
 
 def get_user(user_id):
@@ -85,9 +87,9 @@ def update_user(user_data, user_id):
         user.updated_at = datetime.now()
         db.commit()
         db.close()
-        return JSONResponse({"Message": "user upadate successfully"})
+        return JSONResponse({"Message": "User upadate successfully"})
     else:
-        raise HTTPException(status_code=404, detail="user not found")
+        raise HTTPException(status_code=404, detail="User not found")
     
 def update_address(user_data, user_id):
     user = (
@@ -100,6 +102,6 @@ def update_address(user_data, user_id):
         user.updated_at = datetime.now()
         db.commit()
         db.close()
-        return JSONResponse({"Message": "address upadate successfully"})
+        return JSONResponse({"Message": "Address upadate successfully"})
     else:
-        raise HTTPException(status_code=404, detail="user not found")
+        raise HTTPException(status_code=404, detail="User not found")
