@@ -11,7 +11,7 @@ db = Sessionlocal()
 tz = timezone('Asia/Kolkata')
 
 def generate_token(user_data, exp):
-    expires_delta = timedelta(minutes=int(exp))
+    expires_delta = timedelta(days=int(exp))
     user_data["exp"] = datetime.now(tz) + expires_delta
     data = user_data
     encode_data = jwt.encode(data, Config.JWT_SECRET_KEY, algorithm=Config.ALGORITHM)

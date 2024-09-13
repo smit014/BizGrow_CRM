@@ -1,18 +1,19 @@
 from backend.database.database import Sessionlocal
 from backend.src.resource.organization.model import Organization
-from backend.src.resource.organization.serializer import serializer_for_organization
+from backend.src.resource.organization.serializer import serializer_for_organization,serializer_for_all_org_name
 from backend.src.resource.userroll.model import UserRole
 import uuid
 from datetime import datetime
 from fastapi.responses import JSONResponse
 from fastapi import HTTPException
+from sqlalchemy.exc import IntegrityError
 
 
 db = Sessionlocal()
-
 def create_organization(org_details, user_id):
     id = str(uuid.uuid4())
     try:
+        # Start a transaction
         org_info = Organization(
             id=id,
             name=org_details.get('name'),
@@ -20,29 +21,39 @@ def create_organization(org_details, user_id):
             country=org_details.get('country'),
             country_state=org_details.get('state'),
             address=org_details.get('address'),
-            GST_no=org_details.get('gst_no')
+            GST_no=org_details.get('gst_no') if org_details.get('gst_no') else None
         )
         db.add(org_info)
-        db.commit()
 
         # Assign the user as an admin for this organization
         user_role = UserRole(
+            id=str(uuid.uuid4()),
             user_id=user_id,
             organization_id=id,
             role='Admin'  # Assign the role as Admin
         )
         db.add(user_role)
+
+        # Commit only if both operations are successful
         db.commit()
 
         return JSONResponse({"Message": "Organization created successfully", "Org_id": str(id)})
-    except Exception as e:
+
+    except IntegrityError as ie:
+        # Handle unique constraint errors specifically
         db.rollback()
-        raise HTTPException(status_code=400, detail="Enter the mandatory fields")
+        raise HTTPException(status_code=400, detail=f"Unique value error: {str(ie.orig)}")
+
+    except Exception as e:
+        # Rollback the transaction if any other error occurs
+        db.rollback()
+        raise HTTPException(status_code=400, detail=f"Error: {str(e)}")
+
     finally:
         db.close()
 
+
 def update_organization(org_id, org_details, user_id):
-    db = Sessionlocal()
     try:
         # Check if the user is an admin for this organization
         user_role = db.query(UserRole).filter_by(user_id=user_id, organization_id=org_id, role='Admin').first()
@@ -71,11 +82,11 @@ def update_organization(org_id, org_details, user_id):
 
 
 def get_organization_details(org_id, user_id):
-    db = Sessionlocal()
     try:
         # Check if the user belongs to the organization
+        breakpoint()
         user_role = db.query(UserRole).filter_by(user_id=user_id, organization_id=org_id).first()
-        if not user_role:
+        if user_role:
             org_data = db.query(Organization).filter_by(id=org_id).first()
             if org_data:
                 filter_data = serializer_for_organization(org_data) 
@@ -92,7 +103,6 @@ def get_organization_details(org_id, user_id):
 
 
 def delete_organization(org_id, user_id):
-    db = Sessionlocal()
     try:
         # Check if the user is an admin for this organization
         user_role = db.query(UserRole).filter_by(user_id=user_id, organization_id=org_id, role='Admin').first()
@@ -115,19 +125,12 @@ def delete_organization(org_id, user_id):
 
 
 def list_user_organizations(user_id):
-    db = Sessionlocal()
     try:
         user_roles = db.query(UserRole).filter_by(user_id=user_id).all()
         org_ids = [user_role.organization_id for user_role in user_roles]
         organizations = db.query(Organization).filter(Organization.id.in_(org_ids)).all()
 
-        org_list = [{
-            "id": org.id,
-            "name": org.name,
-            "industry": org.industry,
-            "country": org.country,
-            "state": org.country_state
-        } for org in organizations]
+        org_list = serializer_for_all_org_name(organizations)
 
         return JSONResponse({"Organizations": org_list})
     except Exception as e:
@@ -137,13 +140,13 @@ def list_user_organizations(user_id):
 
 
 def assign_role_to_user(org_id, user_id, target_user_id, role):
-    db = Sessionlocal()
     try:
         # Check if the user is an admin for this organization
         user_role = db.query(UserRole).filter_by(user_id=user_id, organization_id=org_id, role='Admin').first()
         if user_role:
             # Assign the role to the target user
             new_user_role = UserRole(
+                id=str(uuid.uuid4()),
                 user_id=target_user_id,
                 organization_id=org_id,
                 role=role
@@ -162,7 +165,6 @@ def assign_role_to_user(org_id, user_id, target_user_id, role):
 
 
 def remove_user_from_organization(org_id, admin_user_id, target_user_id):
-    db = Sessionlocal()
     try:
         # Check if the admin user is an admin for this organization
         admin_role = db.query(UserRole).filter_by(user_id=admin_user_id, organization_id=org_id, role='Admin').first()

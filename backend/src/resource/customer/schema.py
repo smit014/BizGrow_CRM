@@ -1,26 +1,27 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from typing import Optional
 
-class CustomerRequest(BaseModel):
-    name : str
-    email : str
-    phone : Optional[int]
-    company_name : Optional[str]
-    bill_address : Optional[str]
-    city : Optional[str]
-    state : Optional[str]
-    pincode : Optional[int]
+class CustomerCreate(BaseModel):
+    name: str
+    email: EmailStr
+    phone: str
+    company_name: str
+    bill_address: str
+    city: str
+    state: str
+    pincode: str
 
 
-class UpdateCustomer(BaseModel):
-    name : Optional[str]
-    email : Optional[str]
-    phone : Optional[int]
-    company_name : Optional[str]
-    bill_address : Optional[str]
-    city : Optional[str]
-    state : Optional[str]
-    pincode : Optional[int]
+class CustomerUpdate(BaseModel):
+    name: Optional[str]
+    email: Optional[EmailStr]
+    phone: Optional[str]
+    company_name: Optional[str]
+    bill_address: Optional[str]
+    city: Optional[str]
+    state: Optional[str]
+    pincode: Optional[str]
+
 
 class CustomerStatus(BaseModel):
     is_active : bool

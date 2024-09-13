@@ -18,12 +18,11 @@ class Organization(Base):
     created_at = Column(DateTime, default=datetime.now())
     updated_at = Column(DateTime, default=datetime.now(), onupdate=datetime.now())
 
-    users = relationship("UserRole", back_populates="organization")
-    invoices = relationship("Invoice", back_populates="organization")
-    customer = relationship("Customer", back_populates="organization")
-    # reports = relationship("Report", back_populates="organization")
-    # forecasts = relationship("Forecast", back_populates="organization")
-    # inventory = relationship("Inventory", back_populates="organization")
+    # Relationships
+    # users = relationship("UserRole", back_populates="organization")
+    # customers = relationship("Customer", back_populates="organization")
+    # items = relationship("Item", back_populates="organization")
+    # invoices = relationship("Invoice", back_populates="organization")
 
     # todo: add Base currency support
     # todo: add image logo of business

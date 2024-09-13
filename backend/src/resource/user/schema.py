@@ -4,10 +4,10 @@ from typing import Optional
 
 class UserRequest(BaseModel):
     name: str
-    phone_no: Optional[int]
-    email: Optional[str]
-    password: Optional[str]
-    address: Optional[str]
+    phone_no: int
+    email: str
+    password: str
+    address: Optional[str]= None
 
 
 class UserUpdate(BaseModel):
@@ -18,3 +18,6 @@ class UserUpdate(BaseModel):
 
 class AddressUpdate(BaseModel):
     address: str
+
+class subscriptionRequest(BaseModel):
+    email : str

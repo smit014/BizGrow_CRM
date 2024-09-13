@@ -5,13 +5,11 @@ from sqlalchemy import pool
 from backend.src.config import Config
 from alembic import context
 from backend.database.database import Base
-from backend.src.resource.user.model import User
+from backend.src.resource.user.model import User,Subscription
 from backend.src.resource.items.model import Item
-from backend.src.resource.invoices.model import Invoice
-from backend.src.resource.invoices.model import InvoiceItem
+from backend.src.resource.invoice.model import Invoice,InvoiceItem
 from backend.src.resource.customer.model import Customer
 from backend.src.resource.userroll.model import UserRole
-
 from backend.src.resource.organization.model import Organization
 
 # this is the Alembic Config object, which provides
@@ -68,7 +66,7 @@ def run_migrations_online() -> None:
 
     """
     connectable = engine_from_config(
-        config.get_section(config.config_ini_section, {}),
+        config.get_section(config.config_ini_section,{}),
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )

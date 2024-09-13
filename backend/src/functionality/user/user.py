@@ -1,5 +1,5 @@
 from backend.database.database import Sessionlocal
-from backend.src.resource.user.model import User
+from backend.src.resource.user.model import User,Subscription
 from werkzeug.security import generate_password_hash
 from fastapi import HTTPException
 from fastapi.responses import JSONResponse
@@ -18,7 +18,7 @@ def create_user(user_details):
     
     existing_user = db.query(User).filter_by(email=user_details.get("email"), is_active=True).first()
     if existing_user:
-        raise HTTPException(status_code=403, detail="Email is already used, please log in")
+        raise HTTPException(status_code=403, detail="Email is already used, Please log in or Use another Email")
     
     user_info = User(
         id=id,
@@ -33,15 +33,20 @@ def create_user(user_details):
     return JSONResponse({"Message": "User created successfully", "User_id": str(id)})
 
 
-def get_user(user_id):
+def get_user(user_id,user_details):
     user_data = (
         db.query(User).filter_by(id=user_id, is_active=True, is_deleted=False).first()
     )
-    if user_data:
-        filter_data = serializer_for_getuser(user_data)
-        return JSONResponse({"Data": filter_data})
+    org_id = user_details.get("orgorganization_id")
+    org_message = user_details.get("organization_message")
+    if org_id :
+        if user_data:
+            filter_data = serializer_for_getuser(user_data,org_id)
+            return JSONResponse({"Data": filter_data})
+        else:
+            raise HTTPException(status_code=404, detail="User not found")
     else:
-        raise HTTPException(status_code=404, detail="User not found")
+        return JSONResponse(f"Message : {org_message}")
 
 
 def delete_user(user_id, user_details):
@@ -105,3 +110,19 @@ def update_address(user_data, user_id):
         return JSONResponse({"Message": "Address upadate successfully"})
     else:
         raise HTTPException(status_code=404, detail="User not found")
+    
+
+def create_subscription(user_details):
+    id = str(uuid.uuid4())
+    existing_user = db.query(User).filter_by(email=user_details.get("email")).first()
+    if existing_user:
+        raise HTTPException(status_code=403, detail="You alredy subscribed")
+    
+    subscriber = Subscription(
+        id=id,
+        email=user_details.get("email"),
+    )
+    db.add(subscriber)
+    db.commit()
+    db.close()
+    return JSONResponse({"Message": "Subscribe successfully"})
