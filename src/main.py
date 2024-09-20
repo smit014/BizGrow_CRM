@@ -8,6 +8,7 @@ from src.resource.customer.api import customer_router
 from src.resource.organization.api import organization_router
 from src.resource.items.api import item_router
 from src.resource.invoice.api import invoice_router
+from src.resource.dashboard.api import dashboard_router
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -28,3 +29,4 @@ app.include_router(organization_router)
 app.include_router(item_router)
 app.include_router(customer_router)
 app.include_router(invoice_router)
+app.include_router(dashboard_router)

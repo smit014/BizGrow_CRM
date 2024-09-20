@@ -27,5 +27,14 @@ class Item(Base):
     # creator = relationship("User", back_populates="items")
     # invoice_items = relationship("InvoiceItem", back_populates="item")
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "description": self.description,
+            "price": self.sell_price,
+            "created_at": self.created_at
+            # Include other fields as needed
+        }
 #TODO: Add quantity when adding inventory
 #TODO: Add image

@@ -29,3 +29,12 @@ class Customer(Base):
     # organization = relationship("Organization", back_populates="customers")
     # created_by = relationship("User", back_populates="customers")
     # invoices = relationship("Invoice", back_populates="customer") 
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "email": self.email,
+            "created_at": self.created_at
+            # Include other fields as needed
+        }

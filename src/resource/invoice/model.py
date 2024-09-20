@@ -30,7 +30,14 @@ class Invoice(Base):
     # creator = relationship("User", back_populates="invoices")
     # invoice_items = relationship("InvoiceItem", back_populates="invoice")
     # customer = relationship("Customer", back_populates="invoices") 
-
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "total_amount": self.total_amount,
+            "invoice_date": self.invoice_date,
+            "status": self.status
+            # Include other fields as needed
+        }
 
 class InvoiceItem(Base):
     __tablename__ = 'invoice_items'
