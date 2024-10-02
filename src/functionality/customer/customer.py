@@ -104,6 +104,27 @@ def get_customer(customer_id, org_id,user_id):
         raise HTTPException(status_code=404, detail="Customer not found")
 
 
+def get_all_customers(org_id, user_id):
+    # Check if the user is active and belongs to the organization
+    user = db.query(User).filter_by(id=user_id, is_active=True, is_deleted=False).first()
+    if not user:
+        raise HTTPException(status_code=403, detail="User not found or not active")
+    
+    user_orgs = db.query(UserRole).filter_by(user_id=user_id, organization_id=org_id).first()
+    if not user_orgs:
+        raise HTTPException(status_code=403, detail="User does not belong to this organization")
+
+    # Retrieve all active customers for the organization
+    customers = db.query(Customer).filter_by(organization_id=org_id, status="Active").all()
+    
+    if customers:
+        # Serialize the customer data for response
+        filter_data = [serializer_for_customer(customer) for customer in customers]
+        return JSONResponse({"Data": filter_data})
+    else:
+        return JSONResponse({"Data": [], "Message": "No active customers found."})
+
+
 def delete_customer(customer_id, org_id,user_id):
     user = db.query(User).filter_by(id=user_id, is_active=True, is_deleted=False).first()
     if not user:

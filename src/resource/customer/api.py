@@ -23,7 +23,7 @@ from fastapi import APIRouter, Depends
 from typing import Annotated
 from src.resource.customer.schema import CustomerCreate, CustomerUpdate
 from src.functionality.customer.customer import (
-    create_customer, update_customer, get_customer, delete_customer
+    create_customer, update_customer, get_customer, delete_customer,get_all_customers
 )
 from src.utils.validator import authorization
 
@@ -61,6 +61,15 @@ def get_customer_api(org_id: str,
     user_id = user_data.get("user_data").get("id")
     # org_id = user_data.get("user_data").get("organization_id")
     response = get_customer(customer_id, org_id, user_id)
+    return response
+
+@customer_router.get("/{org_id}/customer/", status_code=200)
+def get_all_customer_api(org_id: str, 
+    user_data: Annotated[dict, Depends(authorization)]
+):
+    user_id = user_data.get("user_data").get("id")
+    # org_id = user_data.get("user_data").get("organization_id")
+    response = get_all_customers(org_id, user_id)
     return response
 
 # Delete a customer (soft delete by setting status to Inactive)
