@@ -4,8 +4,7 @@ def serializer_for_getuser(users_data,org_id):
     filter_data = []
 
     for record in users_data:
-        filter_data.append(
-            {
+        filter_data = {
                 "id": record.id,
                 "name": record.name,
                 "phone_no": record.phone_no,
@@ -14,7 +13,7 @@ def serializer_for_getuser(users_data,org_id):
                 "active": record.is_active,
                 "orgs": org_id,
             }
-        )
+
     return filter_data
 
 

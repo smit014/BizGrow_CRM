@@ -1,11 +1,10 @@
 def serializer_for_customer(customer_data):
     if not isinstance(customer_data, list):
         customer_data = [customer_data]
-    filter_data = []
+    filter_data = {}
 
     for record in customer_data:
-        filter_data.append(
-            {
+        filter_data = {
                 "id": record.id,
                 "name": record.name,
                 "email": record.email,
@@ -35,5 +34,4 @@ def serializer_for_customer(customer_data):
                     for invoice in getattr(record, 'invoices', [])
                 ],
             }
-        )
     return filter_data

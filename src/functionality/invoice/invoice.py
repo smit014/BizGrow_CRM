@@ -7,6 +7,8 @@ from fastapi.responses import JSONResponse
 from fastapi import HTTPException
 import uuid
 from datetime import datetime
+from src.resource.invoice.serializer import serializer_for_invoice
+from sqlalchemy.orm import joinedload
 
 db = Sessionlocal()
 
@@ -75,20 +77,34 @@ def get_invoice(invoice_id, org_id, user_data):
         if not invoice:
             raise HTTPException(status_code=404, detail="Invoice not found")
         
-        # Optional: Serialize the invoice details here
-        invoice_data = {
-            "id": invoice.id,
-            "invoice_no": invoice.invoice_no,
-            "total_amount": invoice.total_amount,
-            "invoice_date": invoice.invoice_date,
-            "customer_id": invoice.customer_id,
-        }
+        # Serialize invoice details
+        filter_data = serializer_for_invoice(invoice)
 
-        return JSONResponse({"Invoice": invoice_data})
+        return JSONResponse({"Invoices": filter_data})
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Error retrieving invoice: {str(e)}")
     finally:
         db.close()
+
+
+def get_all_invoices(org_id, user_data):
+    try:
+        # Fetch all invoices for the given organization
+        invoices = db.query(Invoice).options(joinedload(Invoice.items)).filter_by(organization_id=org_id).all()
+        
+        # Check if any invoices are found
+        if not invoices:
+            raise HTTPException(status_code=404, detail="No invoices found for this organization")
+        
+        # Serialize invoice details
+        filter_data = serializer_for_invoice(invoices)
+
+        return JSONResponse({"Invoices": filter_data})
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Error retrieving invoices: {str(e)}")
+    finally:
+        db.close()
+
 
 def update_invoice(invoice_id, org_id, invoice_details, user_data):
     try:

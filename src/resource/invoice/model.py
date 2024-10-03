@@ -25,6 +25,8 @@ class Invoice(Base):
     overdue_date = Column(DateTime) # overdue date for invoice
     status = Column(String,nullable=False)
 
+    # Define relationship with InvoiceItem
+    items = relationship('InvoiceItem', back_populates='invoice')
     # Relationships
     # organization = relationship("Organization", back_populates="invoices")
     # creator = relationship("User", back_populates="invoices")
@@ -49,6 +51,8 @@ class InvoiceItem(Base):
     unit_price = Column(Numeric(10, 2), nullable=False)  # Unit price of the item
     total_price = Column(Numeric(10, 2), nullable=False)  # Total price (unit_price * quantity)
 
+    # Define back reference to Invoice
+    invoice = relationship('Invoice', back_populates='items')
     # Relationships
     # invoice = relationship("Invoice", back_populates="invoice_items")
     # item = relationship("Item", back_populates="invoice_items")

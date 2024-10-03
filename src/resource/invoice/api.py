@@ -25,7 +25,7 @@ from fastapi import APIRouter, Depends
 from typing import Annotated
 from src.resource.invoice.schema import InvoiceCreate, InvoiceUpdate
 from src.utils.validator import authorization
-from src.functionality.invoice.invoice import create_invoice, get_invoice, delete_invoice, update_invoice
+from src.functionality.invoice.invoice import create_invoice, get_invoice, delete_invoice, update_invoice,get_all_invoices
 
 invoice_router = APIRouter()
 
@@ -39,6 +39,12 @@ def create_invoice_api(org_id: str,invoice_data: InvoiceCreate, user_data: Annot
 def get_invoice_api(org_id: str,invoice_id: str, user_data: Annotated[dict, Depends(authorization)]):
     user_data = user_data.get("user_data")
     invoice_info = get_invoice(invoice_id, org_id, user_data)
+    return invoice_info
+
+@invoice_router.get("/{org_id}/get_invoice", status_code=200)
+def get_all_invoice_api(org_id: str, user_data: Annotated[dict, Depends(authorization)]):
+    user_data = user_data.get("user_data")
+    invoice_info = get_all_invoices(org_id, user_data)
     return invoice_info
 
 @invoice_router.patch("/{org_id}/update_invoice/{invoice_id}", status_code=201)
