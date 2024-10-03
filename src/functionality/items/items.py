@@ -35,8 +35,19 @@ def create_item(item_details, user_id, org_id):
     db.add(new_item)
     db.commit()
     db.refresh(new_item)
+
+    item_response ={
+        "id":id,
+        "name":item_details.get("name"),
+        "description":item_details.get("description"),
+        "purchase_price":item_details.get("purchase_price"),
+        "sell_price":item_details.get("sell_price"),
+        "profit":item_details.get("sell_price") - item_details.get("purchase_price"),
+        "creator_id":user_id,
+        "organization_id":org_id,
+    }
     
-    return JSONResponse({"Message": "Item created successfully", "Item_id": str(id)})
+    return JSONResponse({"Message": "Item created successfully", "Item":item_response})
 
 
 def update_item(item_id, update_details, user_id, org_id):

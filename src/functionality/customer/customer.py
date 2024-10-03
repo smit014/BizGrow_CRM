@@ -49,8 +49,24 @@ def create_customer(customer_details, org_id,user_id):
     db.add(new_customer)
     db.commit()
     db.close()
+
+    customer_response = {
+        "id":customer_id,
+        "name":customer_details.get("name"),
+        "email":customer_details.get("email"),
+        "phone":customer_details.get("phone"),
+        "company_name":customer_details.get("company_name"),
+        "bill_address":customer_details.get("bill_address"),
+        "city":customer_details.get("city"),
+        "state":customer_details.get("state"),
+        "pincode_no":customer_details.get("pincode"),
+        "organization_id":org_id,
+        "created_by":user_id,
+        "status":"Active"
+    }
+
     
-    return JSONResponse({"Message": "Customer created successfully", "Customer_id": customer_id})
+    return JSONResponse({"Message": "Customer created successfully", "Customer": customer_response})
 
 def update_customer(customer_id, customer_data, org_id,user_id):
     user = db.query(User).filter_by(id=user_id, is_active=True, is_deleted=False).first()
