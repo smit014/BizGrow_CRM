@@ -63,7 +63,7 @@ def get_customer_api(org_id: str,
     response = get_customer(customer_id, org_id, user_id)
     return response
 
-@customer_router.get("/{org_id}/customer/", status_code=200)
+@customer_router.get("/{org_id}/customers/", status_code=200)
 def get_all_customer_api(org_id: str, 
     user_data: Annotated[dict, Depends(authorization)]
 ):
