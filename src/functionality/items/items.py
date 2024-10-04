@@ -90,7 +90,7 @@ def get_all_items(org_id, user_id):
 
     items = db.query(Item).filter_by(organization_id=org_id).all()
     if items:
-        filter_data = serializer_for_item(items)
+        filter_data = [serializer_for_item(item) for item in items]
         return JSONResponse({"Data": filter_data})
     else:
         raise HTTPException(status_code=404, detail="Create your first item")
@@ -102,7 +102,7 @@ def get_all_items_name(org_id, user_id):
 
     items = db.query(Item).filter_by(organization_id=org_id).all()
     if items:
-        filter_data = serializer_for_item_name(items)
+        filter_data = [serializer_for_item_name(item) for item in items]
         return JSONResponse({"Data": filter_data})
     else:
         raise HTTPException(status_code=404, detail="Create your first item")
