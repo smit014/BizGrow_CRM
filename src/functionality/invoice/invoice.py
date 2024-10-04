@@ -60,8 +60,18 @@ def create_invoice(invoice_details, org_id, user_data):
         )
         db.add(invoice)
         db.commit()
-
-        return JSONResponse({"Message": "Invoice created successfully", "Invoice_id": invoice_id})
+        invoice_responce ={
+            "id" : id,
+            "invoice_no":invoice_details.get("invoice_no"),
+            "organization_id":organization_id,
+            "creator_id":user_id,
+            "customer_id" : invoice_details.get("customer_id"),   
+            "total_amount":total_amount,
+            "invoice_date":invoice_details.get("invoice_date"),
+            "overdue_date":overdue_date,
+            "status":invoice_details.get('status', 'unpaid')
+        }
+        return JSONResponse({"Message": "Invoice created successfully", "Invoice_responce": invoice_responce})
     
     except Exception as e:
         db.rollback()
@@ -98,7 +108,7 @@ def get_all_invoices(org_id, user_data):
             raise HTTPException(status_code=404, detail="No invoices found for this organization")
         
         # Serialize invoice details
-        filter_data = serializer_for_invoice(invoices)
+        filter_data =[serializer_for_invoice(invoice) for invoice in invoices]
 
         return JSONResponse({"Invoices": filter_data})
     except Exception as e:
