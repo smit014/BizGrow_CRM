@@ -60,15 +60,16 @@ def create_invoice(invoice_details, org_id, user_data):
         )
         db.add(invoice)
         db.commit()
+
         invoice_responce ={
-            "id" : id,
+            "id" : invoice_id,
             "invoice_no":invoice_details.get("invoice_no"),
             "organization_id":organization_id,
             "creator_id":user_id,
             "customer_id" : invoice_details.get("customer_id"),   
             "total_amount":total_amount,
-            "invoice_date":invoice_details.get("invoice_date"),
-            "overdue_date":overdue_date,
+            "invoice_date": invoice_details.get("invoice_date").isoformat() if invoice_details.get("invoice_date") else None,
+            "overdue_date": overdue_date.isoformat() if overdue_date else None,
             "status":invoice_details.get('status', 'unpaid')
         }
         return JSONResponse({"Message": "Invoice created successfully", "Invoice_responce": invoice_responce})
