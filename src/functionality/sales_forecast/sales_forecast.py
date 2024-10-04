@@ -64,14 +64,14 @@ def label_active_months(data):
     # Convert 'invoice_date' to datetime
     data['invoice_date'] = pd.to_datetime(data['invoice_date'])
     
-    # Extract month and year
+    # Extract month and year from 'invoice_date'
     data['month'] = data['invoice_date'].dt.month
     data['year'] = data['invoice_date'].dt.year
 
-    # Calculate total average sales
+    # Calculate total average sales (across all months)
     total_average_sales = data['total_amount'].mean()
 
-    # Group by month and year to calculate monthly average sales
+    # Group by year and month to calculate monthly average sales
     monthly_avg_sales = data.groupby(['year', 'month'])['total_amount'].mean().reset_index()
 
     # Label active month (1 if monthly avg > total avg, else 0)
@@ -80,6 +80,7 @@ def label_active_months(data):
     )
 
     return monthly_avg_sales
+
 
 def train_sales_prediction_model(organization_id):
     # Fetch the last 6 months of sales data
@@ -91,9 +92,11 @@ def train_sales_prediction_model(organization_id):
     labeled_data = label_active_months(sales_data)
     
     # Prepare features for the model (active month, month, day of year)
-    labeled_data['day_of_year'] = labeled_data['invoice_date'].dt.dayofyear
+    labeled_data['day_of_year'] = pd.to_datetime(
+        labeled_data['year'].astype(str) + labeled_data['month'].astype(str), format='%Y%m'
+    ).dt.dayofyear
 
-    # Encode 'active month' (already done in labeled_data)
+    # X will have 'active_month', 'month', and 'day_of_year'
     X = labeled_data[['active_month', 'month', 'day_of_year']]
     y = labeled_data['total_amount']  # Target variable: total sales
 
