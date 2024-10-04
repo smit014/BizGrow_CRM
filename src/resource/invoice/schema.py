@@ -9,11 +9,11 @@ class InvoiceItemSchema(BaseModel):
     quantity: int
     unit_price: float
 class InvoiceUpdate(BaseModel):
-    invoice_no: str = None
+    invoice_no: Optional[str] = None
     total_amount: float = None
 
 class InvoiceBase(BaseModel):
-    invoice_no: str
+    invoice_no: Optional[str] = None
     customer_id: str
     invoice_data : datetime  # bill issue date 
     items: List[InvoiceItemSchema]  # List of items with product_id, quantity, unit_price

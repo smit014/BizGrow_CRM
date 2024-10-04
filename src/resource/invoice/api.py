@@ -31,6 +31,7 @@ invoice_router = APIRouter()
 
 @invoice_router.post("/{org_id}/create_invoice", status_code=201)
 def create_invoice_api(org_id: str,invoice_data: InvoiceCreate, user_data: Annotated[dict, Depends(authorization)]):
+    breakpoint()
     user_data = user_data.get("user_data")
     invoice_info = create_invoice(invoice_data.model_dump(), org_id, user_data)
     return invoice_info
