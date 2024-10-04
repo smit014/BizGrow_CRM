@@ -97,6 +97,24 @@ def get_dashboard(organization_id):
         x_axis = [record.date for record in sales_data]  # Dates
         y_axis = [record.total_sales for record in sales_data]  # Sales values
 
+        # 12. Total Pending Amount (unpaid invoices)
+        total_pending_amount = db.query(
+            func.sum(Invoice.total_amount).label('total_pending')
+        ).filter(
+            Invoice.organization_id == organization_id,
+            Invoice.status == 'unpaid'
+        ).scalar() or 0
+
+        # 13. Outstanding Amount (overdue unpaid invoices)
+        outstanding_amount = db.query(
+            func.sum(Invoice.total_amount).label('outstanding')
+        ).filter(
+            Invoice.organization_id == organization_id,
+            Invoice.status == 'unpaid',
+            Invoice.overdue_date < today
+        ).scalar() or 0
+
+
         # Prepare and return the response
         response = {
             "total_revenue": total_revenue,
@@ -112,7 +130,9 @@ def get_dashboard(organization_id):
             "sales_chart_data": {
                 "x_axis": x_axis,  # Dates
                 "y_axis": y_axis   # Total sales per day
-            }
+            },
+            "total_pending_amount": total_pending_amount,
+            "outstanding_amount": outstanding_amount
         }
 
         return response
