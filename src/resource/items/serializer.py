@@ -2,10 +2,10 @@ def serializer_for_item(item_data):
     if not isinstance(item_data, list):
         item_data = [item_data]
     
-    serialized_items = []
+    serialized_items = {}
     
     for item in item_data:
-        serialized_items.append({
+        serialized_items ={
             "id": item.id,
             "name": item.name,
             "description": item.description,
@@ -17,6 +17,22 @@ def serializer_for_item(item_data):
                 # "username": item.creator.name,
             },
             "updated_at": str(item.updated_at),
-        })
+        }
+    
+    return serialized_items
+
+def serializer_for_item_name(item_data):
+    if not isinstance(item_data, list):
+        item_data = [item_data]
+    
+    serialized_items = {}
+    
+    for item in item_data:
+        serialized_items={
+            "id": item.id,
+            "name": item.name,
+            "description": item.description,
+            "sell_price": float(item.sell_price),
+        }
     
     return serialized_items
