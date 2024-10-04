@@ -93,9 +93,8 @@ def get_dashboard(organization_id):
             func.date(Invoice.invoice_date)
         ).all()
 
-        # Prepare x-axis and y-axis data for chart
-        x_axis = [record.date for record in sales_data]  # Dates
-        y_axis = [record.total_sales for record in sales_data]  # Sales values
+        # Prepare x and y data for chart as [{x: 'date', y: total_sales}]
+        sales_chart_data = [{"x": record.date.isoformat(), "value": record.total_sales} for record in sales_data]
 
         # 12. Total Pending Amount (unpaid invoices)
         total_pending_amount = db.query(
@@ -127,10 +126,7 @@ def get_dashboard(organization_id):
             "monthly_sales": monthly_sales,
             "previous_month_sales": previous_month_sales,
             "monthly_percentage_change": monthly_percentage_change,
-            "sales_chart_data": {
-                "x_axis": x_axis,  # Dates
-                "value": y_axis   # Total sales per day
-            },
+            "sales_chart_data": sales_chart_data,
             "total_pending_amount": total_pending_amount,
             "outstanding_amount": outstanding_amount
         }
