@@ -12,6 +12,7 @@ def serializer_for_invoice(invoice_data):
                 "invoice_no": record.invoice_no,
                 "total_amount": float(record.total_amount) if isinstance(record.total_amount, Decimal) else record.total_amount,  # Convert Decimal to float
                 "invoice_date": str(record.invoice_date),  # Convert to string for consistent formatting
+                "overdue_date": str(record.overdue_date), 
                 "customer_id": record.customer_id,
                 "organization_id": record.organization_id,
                 "created_at": str(record.created_at),
