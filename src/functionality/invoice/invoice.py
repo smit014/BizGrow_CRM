@@ -6,7 +6,7 @@ from src.resource.user.model import User
 from fastapi.responses import JSONResponse
 from fastapi import HTTPException
 import uuid
-from datetime import datetime
+from datetime import datetime,timedelta
 from src.resource.invoice.serializer import serializer_for_invoice
 from sqlalchemy.orm import joinedload
 
@@ -30,6 +30,7 @@ def create_invoice(invoice_details, org_id, user_data):
         items = invoice_details.get('items', [])
         for item in items:
             total_price = item.get('quantity') * item.get('unit_price')
+            total_price += total_price * 12 / 100
             total_amount += total_price
             
             invoice_item = InvoiceItem(
@@ -43,7 +44,7 @@ def create_invoice(invoice_details, org_id, user_data):
             db.add(invoice_item)
 
         # Set the overdue date, either provided or default (30 days from invoice date)
-        # overdue_date = invoice_details.get('overdue_date', datetime.now() + timedelta(days=30))
+        overdue_date = invoice_details.get('overdue_date', datetime.now() + timedelta(days=30))
 
         # Create the invoice with the calculated total amount
         invoice = Invoice(
@@ -54,7 +55,7 @@ def create_invoice(invoice_details, org_id, user_data):
             customer_id = invoice_details.get("customer_id"),   
             total_amount=total_amount,
             invoice_date=invoice_details.get("invoice_date"),
-            overdue_date=invoice_details.get("overdue_date"),
+            overdue_date=overdue_date,
             status=invoice_details.get('status', 'unpaid')
         )
         db.add(invoice)

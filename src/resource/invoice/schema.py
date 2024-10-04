@@ -15,7 +15,7 @@ class InvoiceUpdate(BaseModel):
 class InvoiceBase(BaseModel):
     invoice_no: Optional[str] = None
     customer_id: str
-    invoice_data : datetime  # bill issue date 
+    invoice_date : datetime  # bill issue date 
     items: List[InvoiceItemSchema]  # List of items with product_id, quantity, unit_price
     status: Optional[str] = 'unpaid'  # Default status is 'unpaid'
     overdue_date: Optional[datetime]  # Optional, will default to 30 days from the invoice date

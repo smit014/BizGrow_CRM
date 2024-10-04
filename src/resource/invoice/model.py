@@ -14,7 +14,7 @@ class Invoice(Base):
     __tablename__ = 'invoices'
 
     id = Column(String, primary_key=True, index=True)
-    invoice_date = Column(DateTime, default=datetime.now())
+    invoice_date = Column(DateTime)
     invoice_no = Column(String, nullable=True)  # Invoice number should be unique in organization
     total_amount = Column(Numeric(10, 2), nullable=False)  # Total amount of the invoice
     created_at = Column(DateTime, default=datetime.now())
