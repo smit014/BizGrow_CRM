@@ -129,7 +129,7 @@ def get_dashboard(organization_id):
             "monthly_percentage_change": monthly_percentage_change,
             "sales_chart_data": {
                 "x_axis": x_axis,  # Dates
-                "y_axis": y_axis   # Total sales per day
+                "value": y_axis   # Total sales per day
             },
             "total_pending_amount": total_pending_amount,
             "outstanding_amount": outstanding_amount
