@@ -164,7 +164,7 @@ def predict_next_30_days_sales(organization_id, active_month):
 
         response = {
             "x_axis": x_axis,  # Dates
-            "y_axis": y_axis 
+            "value": y_axis 
         }
         return response
     else:
