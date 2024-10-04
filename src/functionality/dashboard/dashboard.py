@@ -91,6 +91,8 @@ def get_dashboard(organization_id):
             Invoice.invoice_date >= today - timedelta(days=30)
         ).group_by(
             func.date(Invoice.invoice_date)
+        ).order_by(
+            func.date(Invoice.invoice_date)  # Ensure results are sorted by date
         ).all()
 
         # Prepare x and y data for chart as [{x: 'date', y: total_sales}]
