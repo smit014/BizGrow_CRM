@@ -9,8 +9,7 @@ class InvoiceItemSchema(BaseModel):
     quantity: int
     unit_price: float
 class InvoiceUpdate(BaseModel):
-    invoice_no: Optional[str] = None
-    total_amount: float = None
+    status: str
 
 class InvoiceBase(BaseModel):
     invoice_no: Optional[str] = None

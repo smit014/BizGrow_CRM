@@ -44,7 +44,7 @@ def create_invoice(invoice_details, org_id, user_data):
             db.add(invoice_item)
 
         # Set the overdue date, either provided or default (30 days from invoice date)
-        overdue_date = invoice_details.get('overdue_date', datetime.now() + timedelta(days=30))
+        # overdue_date = invoice_details.get('overdue_date', datetime.now() + timedelta(days=30))
 
         # Create the invoice with the calculated total amount
         invoice = Invoice(
@@ -55,7 +55,7 @@ def create_invoice(invoice_details, org_id, user_data):
             customer_id = invoice_details.get("customer_id"),   
             total_amount=total_amount,
             invoice_date=invoice_details.get("invoice_date"),
-            overdue_date=overdue_date,
+            overdue_date=invoice_details.get("overdue_date"),
             status=invoice_details.get('status', 'unpaid')
         )
         db.add(invoice)
@@ -69,7 +69,7 @@ def create_invoice(invoice_details, org_id, user_data):
             "customer_id" : invoice_details.get("customer_id"),   
             "total_amount":total_amount,
             "invoice_date": invoice_details.get("invoice_date").isoformat() if invoice_details.get("invoice_date") else None,
-            "overdue_date": overdue_date.isoformat() if overdue_date else None,
+            "overdue_date": invoice_details.get("overdue_date").isoformat() if invoice_details.get("overdue_date") else None,
             "status":invoice_details.get('status', 'unpaid')
         }
         return JSONResponse({"Message": "Invoice created successfully", "Invoice_responce": invoice_responce})
@@ -126,8 +126,7 @@ def update_invoice(invoice_id, org_id, invoice_details, user_data):
             raise HTTPException(status_code=404, detail="Invoice not found")
 
         # Update invoice fields
-        invoice.invoice_no = invoice_details.get('invoice_no') or invoice.invoice_no
-        invoice.total_amount = invoice_details.get('total_amount') or invoice.total_amount
+        invoice.status = invoice_details.get('status') or invoice.status
         invoice.updated_at = datetime.now()
 
         db.commit()

@@ -4,7 +4,7 @@ from src.functionality.sales_forecast.sales_forecast import predict_sales, predi
 
 sales_router = APIRouter()
 
-@sales_router.get("/{org_id}/predict-sales", status_code=200)
+@sales_router.post("/{org_id}/predict-sales", status_code=200)
 def predict_sales_api(org_id:str, prediction_date:PredictionRequest):
 
     sales_info = predict_sales(org_id,prediction_date.model_dump())
