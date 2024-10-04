@@ -23,7 +23,7 @@ from fastapi import APIRouter, Depends
 from typing import Annotated
 from src.resource.items.schema import ItemCreate, ItemUpdate
 from src.utils.validator import authorization
-from src.functionality.items.items import create_item, update_item, get_item, get_all_items
+from src.functionality.items.items import create_item, update_item, get_item, get_all_items,get_all_items_name
 
 item_router = APIRouter()
 
@@ -57,4 +57,11 @@ def get_all_items_api(org_id: str, user_data: Annotated[dict, Depends(authorizat
     # org_id = user_data.get("user_data").get("organization_id")
     user_id = user_data.get("user_data").get("id")
     response = get_all_items(org_id, user_id)
+    return response
+
+@item_router.get("/{org_id}/items/name", status_code=200)
+def get_all_items_name_api(org_id: str, user_data: Annotated[dict, Depends(authorization)]):
+    # org_id = user_data.get("user_data").get("organization_id")
+    user_id = user_data.get("user_data").get("id")
+    response = get_all_items_name(org_id, user_id)
     return response

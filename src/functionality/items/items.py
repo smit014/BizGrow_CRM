@@ -2,7 +2,7 @@ from database.database import Sessionlocal
 from src.resource.user.model import User
 from src.resource.userroll.model import UserRole
 from src.resource.items.model import Item
-from src.resource.items.serializer import serializer_for_item
+from src.resource.items.serializer import serializer_for_item,serializer_for_item_name
 import uuid
 from datetime import datetime
 from fastapi.responses import JSONResponse
@@ -95,3 +95,14 @@ def get_all_items(org_id, user_id):
     else:
         raise HTTPException(status_code=404, detail="Create your first item")
 
+def get_all_items_name(org_id, user_id):
+    user = db.query(UserRole).filter_by(user_id=user_id, organization_id=org_id).first()
+    if not user:
+        raise HTTPException(status_code=403, detail="User not authorized to get items form this organization")
+
+    items = db.query(Item).filter_by(organization_id=org_id).all()
+    if items:
+        filter_data = serializer_for_item_name(items)
+        return JSONResponse({"Data": filter_data})
+    else:
+        raise HTTPException(status_code=404, detail="Create your first item")
