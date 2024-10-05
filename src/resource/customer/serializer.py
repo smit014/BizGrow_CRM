@@ -1,3 +1,4 @@
+from decimal import Decimal
 def serializer_for_customer(customer_data):
     if not isinstance(customer_data, list):
         customer_data = [customer_data]
@@ -22,14 +23,12 @@ def serializer_for_customer(customer_data):
                     "user_id": record.created_by,
                     # "username": record.creator_name,
                 } if record.created_by else {},
-                "created_at": str(record.created_at),
-                "updated_at": str(record.updated_at),
+                
                 "status": record.status,
                 "invoices": [
                     {
                         "invoice_id": invoice.id,
-                        "total_amount": invoice.total_amount,
-                        "created_at": str(invoice.created_at),
+                        "total_amount": float(invoice.total_amount) if isinstance(invoice.total_amount, Decimal) else invoice.total_amount,
                     }
                     for invoice in getattr(record, 'invoices', [])
                 ],
