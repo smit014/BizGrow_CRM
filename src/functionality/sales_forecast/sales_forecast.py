@@ -10,6 +10,7 @@ from fastapi import HTTPException
 from sklearn.impute import SimpleImputer
 from fastapi.responses import JSONResponse
 import os
+from fastapi.encoders import jsonable_encoder
 
 
 db = Sessionlocal()
@@ -119,11 +120,13 @@ def train_sales_prediction_model(organization_id):
     print(f"Mean Squared Error: {mse}")
     print(f"R-squared: {r2}")
 
+    # Ensure the response is serializable
+    # result=jsonable_encoder(mse,r2)
     # Save the trained model
     with open(f'sales_prediction_model_of_{organization_id}.pkl', 'wb') as f:
         pickle.dump(model, f)
 
-    return model
+    return JSONResponse({"Message":"model trained successfully"})
 
 def predict_sales_for_date(organization_id, new_date):
     # Load the trained model
@@ -161,14 +164,11 @@ def predict_next_30_days_sales(organization_id, active_month):
         # Predict sales for the next 30 days
         predicted_sales = model.predict(prediction_data)
 
-        # Prepare X (dates) and Y (predicted sales) for the frontend
-        x_axis = [d.strftime('%Y-%m-%d') for d in next_30_days]  # Convert to string format for frontend
-        y_axis = predicted_sales.tolist()  # Convert predictions to list format
-
-        response = {
-            "x_axis": x_axis,  # Dates
-            "value": y_axis 
-        }
+        # Prepare the response [{x: 'date', y: 'predicted_sales'}]
+        response = [
+            {"x": d.strftime('%Y-%m-%d'), "value": round(sales, 2)}
+            for d, sales in zip(next_30_days, predicted_sales)
+        ]
         return response
     else:
         # If the model file doesn't exist, raise an exception or return an error
