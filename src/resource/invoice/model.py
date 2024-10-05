@@ -27,6 +27,7 @@ class Invoice(Base):
 
     # Define relationship with InvoiceItem
     items = relationship('InvoiceItem', back_populates='invoice')
+    customer = relationship("Customer", back_populates="invoices")
     # Relationships
     # organization = relationship("Organization", back_populates="invoices")
     # creator = relationship("User", back_populates="invoices")
@@ -53,6 +54,7 @@ class InvoiceItem(Base):
 
     # Define back reference to Invoice
     invoice = relationship('Invoice', back_populates='items')
+    
     # Relationships
     # invoice = relationship("Invoice", back_populates="invoice_items")
     # item = relationship("Item", back_populates="invoice_items")

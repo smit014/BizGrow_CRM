@@ -7,6 +7,7 @@ from src.resource.items.model import Item
 from src.resource.customer.model import Customer
 from datetime import date, timedelta
 from sqlalchemy import func,extract
+from sqlalchemy.exc import SQLAlchemyError
 
 db = Sessionlocal()
 

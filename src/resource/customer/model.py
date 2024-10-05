@@ -29,6 +29,7 @@ class Customer(Base):
     # organization = relationship("Organization", back_populates="customers")
     # created_by = relationship("User", back_populates="customers")
     # invoices = relationship("Invoice", back_populates="customer") 
+    invoices = relationship("Invoice", back_populates="customer")
 
     def to_dict(self):
         return {

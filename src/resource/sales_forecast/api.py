@@ -19,7 +19,7 @@ def predict_next_month_sales_api(organization_id: str):
     sales_info= predict_next_30_days_sales(organization_id, active_month)
     return sales_info
 
-@sales_router.post("/train_sales_model/")
+@sales_router.post("/train_sales_model/{organization_id}")
 def train_sales_model_api(organization_id:str):
     sales_info= train_sales_prediction_model(organization_id)
     return sales_info

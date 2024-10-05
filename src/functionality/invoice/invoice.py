@@ -9,6 +9,7 @@ import uuid
 from datetime import datetime,timedelta
 from src.resource.invoice.serializer import serializer_for_invoice
 from sqlalchemy.orm import joinedload
+from sqlalchemy.exc import SQLAlchemyError
 
 db = Sessionlocal()
 
@@ -77,6 +78,10 @@ def create_invoice(invoice_details, org_id, user_data):
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=400, detail=str(e))
+    except SQLAlchemyError as e:
+        # Rollback the transaction if any SQLAlchemy error occurs
+        db.rollback()
+        raise Exception(f"Database error: {str(e)}")
     
     finally:
         db.close()
@@ -95,27 +100,48 @@ def get_invoice(invoice_id, org_id, user_data):
         return JSONResponse({"Invoices": filter_data})
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Error retrieving invoice: {str(e)}")
+    except SQLAlchemyError as e:
+        # Rollback the transaction if any SQLAlchemy error occurs
+        db.rollback()
+        raise Exception(f"Database error: {str(e)}")
     finally:
         db.close()
 
 
 def get_all_invoices(org_id, user_data):
     try:
-        # Fetch all invoices for the given organization
-        invoices = db.query(Invoice).options(joinedload(Invoice.items)).filter_by(organization_id=org_id).all()
-        
+        # Fetch all invoices for the given organization with the customer details
+        invoices = (
+            db.query(Invoice)
+            .options(joinedload(Invoice.items))  # Load related invoice items
+            .join(Customer, Invoice.customer_id == Customer.id)  # Join with the Customer table
+            .filter(Invoice.organization_id == org_id)  # Filter by organization ID
+            .all()
+        )
+
         # Check if any invoices are found
         if not invoices:
             raise HTTPException(status_code=404, detail="No invoices found for this organization")
         
-        # Serialize invoice details
-        filter_data =[serializer_for_invoice(invoice) for invoice in invoices]
+        # Serialize invoice details including customer name
+        filter_data = [
+            {
+                **serializer_for_invoice(invoice),  # Include serialized invoice details
+                "customer_name": invoice.customer.name  # Add customer name from the joined Customer table
+            }
+            for invoice in invoices
+        ]
 
         return JSONResponse({"Invoices": filter_data})
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Error retrieving invoices: {str(e)}")
+    except SQLAlchemyError as e:
+        # Rollback the transaction if any SQLAlchemy error occurs
+        db.rollback()
+        raise Exception(f"Database error: {str(e)}")
     finally:
         db.close()
+
 
 
 def update_invoice(invoice_id, org_id, invoice_details, user_data):
@@ -134,6 +160,10 @@ def update_invoice(invoice_id, org_id, invoice_details, user_data):
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=400, detail=f"Error updating invoice: {str(e)}")
+    except SQLAlchemyError as e:
+        # Rollback the transaction if any SQLAlchemy error occurs
+        db.rollback()
+        raise Exception(f"Database error: {str(e)}")
     finally:
         db.close()
 
@@ -151,5 +181,9 @@ def delete_invoice(invoice_id, org_id, user_data):
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=400, detail=f"Error deleting invoice: {str(e)}")
+    except SQLAlchemyError as e:
+        # Rollback the transaction if any SQLAlchemy error occurs
+        db.rollback()
+        raise Exception(f"Database error: {str(e)}")
     finally:
         db.close()

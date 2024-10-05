@@ -84,6 +84,16 @@ def label_active_months(data):
 
 
 def train_sales_prediction_model(organization_id):
+    # Check if the model already exists
+    model_file_path = f'sales_prediction_model_of_{organization_id}.pkl'
+    if os.path.exists(model_file_path):
+        # If model exists, load it
+        with open(model_file_path, 'rb') as f:
+            model = pickle.load(f)
+    else:
+        # If no model exists, create a new LinearRegression model
+        model = LinearRegression()
+
     # Fetch the last 6 months of sales data
     sales_data = get_sales_data_for_six_months(organization_id)
     if sales_data is None:
@@ -108,8 +118,7 @@ def train_sales_prediction_model(organization_id):
     # Split data into training and testing sets
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    # Create and train the model
-    model = LinearRegression()
+    # Retrain the existing model with the new data
     model.fit(X_train, y_train)
 
     # Evaluate the model
@@ -120,13 +129,12 @@ def train_sales_prediction_model(organization_id):
     print(f"Mean Squared Error: {mse}")
     print(f"R-squared: {r2}")
 
-    # Ensure the response is serializable
-    # result=jsonable_encoder(mse,r2)
-    # Save the trained model
-    with open(f'sales_prediction_model_of_{organization_id}.pkl', 'wb') as f:
+    # Save the updated model after retraining
+    with open(model_file_path, 'wb') as f:
         pickle.dump(model, f)
 
-    return JSONResponse({"Message":"model trained successfully"})
+    return JSONResponse({"Message": "Model retrained successfully", "mse": mse, "r2": r2})
+
 
 def predict_sales_for_date(organization_id, new_date):
     # Load the trained model
