@@ -7,6 +7,7 @@ import uuid
 from datetime import datetime
 from fastapi.responses import JSONResponse
 from fastapi import HTTPException
+from sqlalchemy.exc import SQLAlchemyError
 
 
 db = Sessionlocal()
@@ -51,6 +52,10 @@ def create_item(item_details, user_id, org_id):
         return JSONResponse({"Message": "Item created successfully", "Item":item_response})
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+    except SQLAlchemyError as e:
+        # Rollback the transaction if any SQLAlchemy error occurs
+        db.rollback()
+        raise Exception(f"Database error: {str(e)}")
 
 
 def update_item(item_id, update_details, user_id, org_id):
@@ -76,6 +81,10 @@ def update_item(item_id, update_details, user_id, org_id):
             raise HTTPException(status_code=404, detail="Item not found")
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+    except SQLAlchemyError as e:
+        # Rollback the transaction if any SQLAlchemy error occurs
+        db.rollback()
+        raise Exception(f"Database error: {str(e)}")
     
 def get_item(item_id, org_id, user_id):
     try:
@@ -91,6 +100,11 @@ def get_item(item_id, org_id, user_id):
             raise HTTPException(status_code=404, detail="Item not found")
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+    except SQLAlchemyError as e:
+        # Rollback the transaction if any SQLAlchemy error occurs
+        db.rollback()
+        raise Exception(f"Database error: {str(e)}")
+
 
 def get_all_items(org_id, user_id):
     try:
@@ -106,6 +120,11 @@ def get_all_items(org_id, user_id):
             raise HTTPException(status_code=404, detail="Create your first item")
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+    except SQLAlchemyError as e:
+        # Rollback the transaction if any SQLAlchemy error occurs
+        db.rollback()
+        raise Exception(f"Database error: {str(e)}")
+
 
 def get_all_items_name(org_id, user_id):
     try:
@@ -121,3 +140,8 @@ def get_all_items_name(org_id, user_id):
             raise HTTPException(status_code=404, detail="Create your first item")
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+    except SQLAlchemyError as e:
+        # Rollback the transaction if any SQLAlchemy error occurs
+        db.rollback()
+        raise Exception(f"Database error: {str(e)}")
+

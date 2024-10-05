@@ -7,6 +7,7 @@ from datetime import datetime
 from fastapi.responses import JSONResponse
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import SQLAlchemyError
 
 
 db = Sessionlocal()
@@ -53,6 +54,10 @@ def create_organization(org_details, user_id):
         # Rollback the transaction if any other error occurs
         db.rollback()
         raise HTTPException(status_code=400, detail=f"Error: {str(e)}")
+    except SQLAlchemyError as e:
+        # Rollback the transaction if any SQLAlchemy error occurs
+        db.rollback()
+        raise Exception(f"Database error: {str(e)}")
 
     finally:
         db.close()
@@ -82,6 +87,10 @@ def update_organization(org_id, org_details, user_id):
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=400, detail=str(e))
+    except SQLAlchemyError as e:
+        # Rollback the transaction if any SQLAlchemy error occurs
+        db.rollback()
+        raise Exception(f"Database error: {str(e)}")
     finally:
         db.close()
 
@@ -102,6 +111,10 @@ def get_organization_details(org_id, user_id):
 
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+    except SQLAlchemyError as e:
+        # Rollback the transaction if any SQLAlchemy error occurs
+        db.rollback()
+        raise Exception(f"Database error: {str(e)}")
     finally:
         db.close()
 
@@ -124,6 +137,10 @@ def delete_organization(org_id, user_id):
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=400, detail=str(e))
+    except SQLAlchemyError as e:
+        # Rollback the transaction if any SQLAlchemy error occurs
+        db.rollback()
+        raise Exception(f"Database error: {str(e)}")
     finally:
         db.close()
 
@@ -139,6 +156,10 @@ def list_user_organizations(user_id):
         return JSONResponse({"Organizations": org_list})
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+    except SQLAlchemyError as e:
+        # Rollback the transaction if any SQLAlchemy error occurs
+        db.rollback()
+        raise Exception(f"Database error: {str(e)}")
     finally:
         db.close()
 
@@ -164,6 +185,10 @@ def assign_role_to_user(org_id, user_id, target_user_id, role):
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=400, detail=str(e))
+    except SQLAlchemyError as e:
+        # Rollback the transaction if any SQLAlchemy error occurs
+        db.rollback()
+        raise Exception(f"Database error: {str(e)}")
     finally:
         db.close()
 
@@ -187,5 +212,9 @@ def remove_user_from_organization(org_id, admin_user_id, target_user_id):
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=400, detail=str(e))
+    except SQLAlchemyError as e:
+        # Rollback the transaction if any SQLAlchemy error occurs
+        db.rollback()
+        raise Exception(f"Database error: {str(e)}")
     finally:
         db.close()
