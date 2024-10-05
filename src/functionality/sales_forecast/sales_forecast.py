@@ -160,11 +160,11 @@ def predict_next_30_days_sales(organization_id, active_month):
         # Calculate the next 30 days from the current date
         current_date = datetime.now() 
         start_date = current_date + timedelta(days=1)  # Start from tomorrow
-        next_30_days = [start_date + timedelta(days=i) for i in range(30)]
+        next_30_days = [start_date + timedelta(days=i) for i in range(60)]
 
         # Prepare data for prediction (active month, month, day_of_year)
         prediction_data = pd.DataFrame({
-            'active month': [1 if active_month else 0] * 30,
+            'active month': [1 if active_month else 0] * 60,
             'month': [d.month for d in next_30_days],
             'day_of_year': [d.timetuple().tm_yday for d in next_30_days]
         })
