@@ -135,23 +135,27 @@ def train_sales_prediction_model(organization_id):
 
 
 def predict_sales_for_date(organization_id, new_date):
+    if os.path.exists(f'sales_prediction_model_of_{organization_id}.pkl'):
     # Load the trained model
-    with open(f'sales_prediction_model_of_{organization_id}.pkl', 'rb') as f:
-        model = pickle.load(f)
+        with open(f'sales_prediction_model_of_organization_id.pkl', 'rb') as f:
+            model = pickle.load(f)
 
-    # Prepare new data for prediction
-    new_data = pd.DataFrame({
-        'active_month': [1],  # Example: yes for active month
-        'month': [new_date.month],
-        'day_of_year': [new_date.timetuple().tm_yday]
-    })
+        # Prepare new data for prediction
+        new_data = pd.DataFrame({
+            'active_month': [1],  # Example: yes for active month
+            'month': [new_date.month],
+            'day_of_year': [new_date.timetuple().tm_yday]
+        })
 
-    # Predict sales
-    predicted_sales = model.predict(new_data)
-    return predicted_sales[0]
+        # Predict sales
+        predicted_sales = model.predict(new_data)
+        return predicted_sales[0]
+    else:
+        # If the model file doesn't exist, raise an exception or return an error
+        raise HTTPException(status_code=404, detail="Model not found. Please ensure the model is trained.")
 
 def predict_next_30_days_sales(organization_id, active_month):
-    if os.path.exists(f'sales_prediction_model_of_organization_id.pkl'):
+    if os.path.exists(f'sales_prediction_model_of_{organization_id}.pkl'):
         # Load the trained model
         with open(f'sales_prediction_model_of_organization_id.pkl', 'rb') as f:
             model = pickle.load(f)
