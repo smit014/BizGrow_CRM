@@ -4,13 +4,13 @@ from database.database import Sessionlocal
 from src.resource.invoice.model import Invoice
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.metrics import  r2_score
 import pickle
 from fastapi import HTTPException
 from sklearn.impute import SimpleImputer
 from fastapi.responses import JSONResponse
 import os
-from fastapi.encoders import jsonable_encoder
+
 
 
 db = Sessionlocal()
@@ -26,7 +26,7 @@ def train_sales_model(organization_id):
 
 def predict_sales(organization_id, prediction_date):
     # Check if the model exists for the user
-    if os.path.exists(f'sales_prediction_model_of_{organization_id}.pkl'):
+    if os.path.exists(f'sales_prediction_model_of_organization_id.pkl'):
         try:
             # Predict sales using the trained model
             predicted_sales = predict_sales_for_date(organization_id, prediction_date)
@@ -123,17 +123,15 @@ def train_sales_prediction_model(organization_id):
 
     # Evaluate the model
     y_pred = model.predict(X_test)
-    mse = mean_squared_error(y_test, y_pred)
     r2 = r2_score(y_test, y_pred)
 
-    print(f"Mean Squared Error: {mse}")
     print(f"R-squared: {r2}")
 
     # Save the updated model after retraining
     with open(model_file_path, 'wb') as f:
         pickle.dump(model, f)
 
-    return JSONResponse({"Message": "Model retrained successfully", "mse": mse, "r2": r2})
+    return JSONResponse({"Message": "Model retrained successfully", "r2": r2})
 
 
 def predict_sales_for_date(organization_id, new_date):
@@ -153,9 +151,9 @@ def predict_sales_for_date(organization_id, new_date):
     return predicted_sales[0]
 
 def predict_next_30_days_sales(organization_id, active_month):
-    if os.path.exists(f'sales_prediction_model_of_{organization_id}.pkl'):
+    if os.path.exists(f'sales_prediction_model_of_organization_id.pkl'):
         # Load the trained model
-        with open(f'sales_prediction_model_of_{organization_id}.pkl', 'rb') as f:
+        with open(f'sales_prediction_model_of_organization_id.pkl', 'rb') as f:
             model = pickle.load(f)
         # Calculate the next 30 days from the current date
         current_date = datetime.now() 
@@ -181,100 +179,3 @@ def predict_next_30_days_sales(organization_id, active_month):
     else:
         # If the model file doesn't exist, raise an exception or return an error
         raise HTTPException(status_code=404, detail="Model not found. Please ensure the model is trained.")
-
-# def gather_sales_data(organization_id):
-#     six_months_ago = datetime.now() - timedelta(days=180)
-    
-#     # Query sales data from the invoice table for the past 6 months
-#     sales_data = db.query(
-#         func.date(Invoice.invoice_date).label('date'),
-#         func.sum(Invoice.total_amount).label('total_amount')
-#     ).filter(
-#         Invoice.organization_id == organization_id,
-#         Invoice.invoice_date >= six_months_ago
-#     ).group_by(
-#         func.date(Invoice.invoice_date)
-#     ).all()
-
-#     # Prepare DataFrame from sales data
-#     data = pd.DataFrame([{
-#         'active month': 1 if sale.date.month in [1, 12] else 0,  # Customize as per active month logic
-#         'month': sale.date.month,
-#         'day_of_year': sale.date.timetuple().tm_yday,
-#         'total_amount': sale.total_amount
-#     } for sale in sales_data])
-    
-#     return data
-
-
-# def train_sales_prediction_model(sales_data, organization_id):
-#     # Ensure sufficient data
-#     if len(sales_data) < 180:  # 6 months of data
-#         return None, "Insufficient data for training the model"
-    
-#     # Prepare features and target variable
-#     X = sales_data[['active month', 'month', 'day_of_year']]
-#     y = sales_data['total_amount']
-    
-#     # Split data into training and testing sets
-#     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    
-#     # Create and train the model
-#     model = LinearRegression()
-#     model.fit(X_train, y_train)
-    
-#     # Evaluate the model
-#     y_pred = model.predict(X_test)
-#     mse = mean_squared_error(y_test, y_pred)
-#     r2 = r2_score(y_test, y_pred)
-    
-#     # Save the model
-#     with open(f'sales_prediction_model_{organization_id}.pkl', 'wb') as f:
-#         pickle.dump(model, f)
-
-#     return model, {"mse": mse, "r2": r2}
-
-
-# def make_sales_prediction(date, organization_id):
-#     try:
-#         # Load the model
-#         with open(f'sales_prediction_model_{organization_id}.pkl', 'rb') as f:
-#             model = pickle.load(f)
-
-#         # Prepare new data for prediction
-#         new_data = pd.DataFrame({
-#             'active month': [1 if date.month in [1, 12] else 0],
-#             'month': [date.month],
-#             'day_of_year': [date.timetuple().tm_yday]
-#         })
-
-#         # Make the prediction
-#         predicted_sales = model.predict(new_data)
-#         return predicted_sales[0]
-    
-#     except FileNotFoundError:
-#         return None, "Model not found"
-
-
-# def predict_sales(org_id):
-    try:
-        # Check if user has at least 6 months of sales data
-        sales_data = gather_sales_data(org_id)
-        if sales_data.empty:
-            raise HTTPException(status_code=400, detail="Insufficient sales data")
-
-        # Train the model
-        model, result = train_sales_prediction_model(sales_data, org_id)
-        if model is None:
-            raise HTTPException(status_code=400, detail=result)
-        
-        # Predict the next month's sales
-        next_month = datetime.now() + timedelta(days=30)
-        prediction, error = make_sales_prediction(next_month, org_id)
-        if error:
-            raise HTTPException(status_code=500, detail=error)
-
-        return {"next_month_sales_prediction": prediction}
-
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
