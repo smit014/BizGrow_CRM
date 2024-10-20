@@ -53,8 +53,7 @@ def create_invoice(invoice_details, org_id, user_data):
             invoice_no=invoice_details.get("invoice_no"),
             organization_id=organization_id,
             creator_id=user_id,
-            customer_id = invoice_details.get("customer_id"),
-            customer_name = invoice_details.get("customer_name"),   
+            customer_id = invoice_details.get("customer_id"),    
             total_amount=total_amount,
             invoice_date=invoice_details.get("invoice_date"),
             overdue_date=invoice_details.get("overdue_date"),
@@ -68,7 +67,8 @@ def create_invoice(invoice_details, org_id, user_data):
             "invoice_no":invoice_details.get("invoice_no"),
             "organization_id":organization_id,
             "creator_id":user_id,
-            "customer_id" : invoice_details.get("customer_id"),   
+            "customer_id" : invoice_details.get("customer_id"),
+            "customer_name" : invoice_details.get("customer_name"),
             "total_amount":total_amount,
             "invoice_date": invoice_details.get("invoice_date").isoformat() if invoice_details.get("invoice_date") else None,
             "overdue_date": invoice_details.get("overdue_date").isoformat() if invoice_details.get("overdue_date") else None,
@@ -117,6 +117,7 @@ def get_all_invoices(org_id, user_data):
             .options(joinedload(Invoice.items))  # Load related invoice items
             .join(Customer, Invoice.customer_id == Customer.id)  # Join with the Customer table
             .filter(Invoice.organization_id == org_id)  # Filter by organization ID
+            .order_by(Invoice.invoice_date.desc()) 
             .all()
         )
 
